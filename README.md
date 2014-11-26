@@ -28,6 +28,27 @@ Or use npm
 npm install ahoy.js
 ```
 
+## Custom Setup
+
+Example of calling a remote API which is allowing the cross origin requests for this domain.
+
+```html
+<script src="jquery.js"></script>
+
+<script>
+    var ahoy = {
+        visitsUrl: 'http://api.example.com/ahoy/visits',
+        eventsUrl: 'http://api.example.com/ahoy/events',
+        requestHeaders: {
+            'Ahoy-Visit': '',
+            'Ahoy-Visitor': ''
+        }
+    };
+</script>
+
+<script src="ahoy.js"></script>
+```
+
 ## How It Works
 
 When someone lands on your website, they are assigned a visit token and a visitor token.
