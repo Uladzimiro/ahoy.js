@@ -21,6 +21,7 @@
   var canStringify = typeof(JSON) !== "undefined" && typeof(JSON.stringify) !== "undefined";
   var eventQueue = [];
   var page = ahoy.page || window.location.pathname;
+  var hostUrl = ahoy.hostUrl || window.location.origin;
   var visitsUrl = ahoy.visitsUrl || "/ahoy/visits"
   var eventsUrl = ahoy.eventsUrl || "/ahoy/events"
 
@@ -104,7 +105,7 @@
       if (canStringify) {
         $.ajax({
           type: "POST",
-          url: eventsUrl,
+          url: hostUrl + eventsUrl,
           data: JSON.stringify([event]),
           contentType: "application/json; charset=utf-8",
           dataType: "json",
@@ -179,7 +180,7 @@
 
       log(data);
 
-      $.post(visitsUrl, data, setReady, "json");
+      $.post(hostUrl + visitsUrl, data, setReady, "json");
     } else {
       log("Cookies disabled");
       setReady();
