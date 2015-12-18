@@ -23,7 +23,7 @@
   var page = ahoy.page || window.location.pathname;
   var visitsUrl = ahoy.visitsUrl || "/ahoy/visits";
   var eventsUrl = ahoy.eventsUrl || "/ahoy/events";
-  var _requestHeaders = ahoy.requestHeaders; // javascript object of headers
+  var needAhoyHeaders = ahoy.needAhoyHeaders;
 
   // cookies
 
@@ -99,44 +99,42 @@
     }
   }
 
+  function sendRequest(url, payload, successCallback) {
+    $.ajax({
+      type: "POST",
+      beforeSend: function(request) {
+        setHeaders(request);
+      },
+      url: url,
+      data: JSON.stringify(payload),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success: successCallback
+    })
+  }
+
   function trackEvent(event) {
     ready( function () {
       // ensure JSON is defined
       if (canStringify) {
-        $.ajax({
-          type: "POST",
-          beforeSend: function(request) {
-            setHeaders(request);
-          },
-          url: eventsUrl,
-          data: JSON.stringify([event]),
-          contentType: "application/json; charset=utf-8",
-          dataType: "json",
-          success: function() {
-            // remove from queue
-            for (var i = 0; i < eventQueue.length; i++) {
-              if (eventQueue[i].id == event.id) {
-                eventQueue.splice(i, 1);
-                break;
-              }
+        sendRequest(eventsUrl, [event], function() {
+          // remove from queue
+          for (var i = 0; i < eventQueue.length; i++) {
+            if (eventQueue[i].id == event.id) {
+              eventQueue.splice(i, 1);
+              break;
             }
-            saveEventQueue();
           }
+          saveEventQueue();
         });
       }
     });
   }
 
   function setHeaders(request) {
-    if (_requestHeaders) {
-      for (var key in _requestHeaders) {
-        if (key === 'Ahoy-Visit') {
-          _requestHeaders[key] = visitId;
-        } else if (key === 'Ahoy-Visitor') {
-          _requestHeaders[key] = visitorId;
-        }
-        request.setRequestHeader(key, _requestHeaders[key]);
-      }              
+    if (needAhoyHeaders) {
+      request.setRequestHeader('Ahoy-Visit', visitId);
+      request.setRequestHeader('Ahoy-Visitor', visitorId);
     }
   }
 
@@ -197,17 +195,7 @@
       log(data);
 
       if (canStringify) {
-        $.ajax({
-          type: "POST",
-          beforeSend: function(request) {
-            setHeaders(request);
-          },
-          url: visitsUrl,
-          data: JSON.stringify(data),
-          contentType: "application/json; charset=utf-8",
-          dataType: "json",
-          success: setReady
-        });
+        sendRequest(visitsUrl, data, setReady)
       }
     } else {
       log("Cookies disabled");

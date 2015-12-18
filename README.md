@@ -28,7 +28,9 @@ Or use npm
 npm install ahoy.js
 ```
 
-## Custom Setup
+## Custom Setup to support cross-origin HTTP request (CORS)
+
+Ahoy cookies will not be sent for CORS. Use custom headers in this case.
 
 Example of calling a remote API which is allowing the cross origin requests for this domain.
 
@@ -39,10 +41,7 @@ Example of calling a remote API which is allowing the cross origin requests for 
     var ahoy = {
         visitsUrl: 'http://api.example.com/ahoy/visits',
         eventsUrl: 'http://api.example.com/ahoy/events',
-        requestHeaders: {
-            'Ahoy-Visit': '',
-            'Ahoy-Visitor': ''
-        }
+        needAhoyHeaders: true
     };
 </script>
 
